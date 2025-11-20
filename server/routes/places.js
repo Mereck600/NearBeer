@@ -65,6 +65,14 @@ function buildWalkingCrawl(candidates, count, maxStepKm = 1.5) {
   return route.map((p, idx) => ({ ...p, order: idx }));
 }
 
+
+
+
+
+
+
+
+
 // GET /api/places/nearby?lat=..&lng=..&count=5
 router.get('/nearby', auth, async (req, res) => {
   const { lat, lng, count = 5 } = req.query;
@@ -109,6 +117,53 @@ router.get('/nearby', auth, async (req, res) => {
     console.error('Error fetching breweries', err.message);
     res.status(500).json({ message: 'Failed to fetch nearby breweries' });
   }
+})
+
+// GET /api/places/geocode?city=Atlanta
+router.get('/geocode', auth, async (req, res) => {
+  const { city } = req.query;
+
+  if (!city || !city.trim()) {
+    return res.status(400).json({ message: 'city query parameter is required' });
+  }
+
+  try{
+    // Nominatim (OpenStreetMap) free geocoding
+    const url = 'https://nominatim.openstreetmap.org/search';
+    const { data } = await axios.get(url, {
+      params: {
+        q: city,
+        format: 'json',
+        limit: 1,
+      },
+      headers: {
+        // Nominatim requires a User-Agent
+        'User-Agent': 'nearBeer/1.0 (https://example.com)',
+      },
+    });
+
+    if (!data || !data.length) {
+      return res.status(404).json({ message: `Could not find a location for "${city}".` });
+    }
+
+    const place = data[0];
+    const lat = parseFloat(place.lat);
+    const lng = parseFloat(place.lon);
+
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+      return res.status(500).json({ message: 'Invalid coordinates returned from geocoder.' });
+    }
+
+    res.json({
+      lat,
+      lng,
+      displayName: place.display_name,
+    });
+  } catch (err) {
+    console.error('Geocode error', err.message);
+    res.status(500).json({ message: 'Failed to geocode city name.' });
+  }
 });
+
 
 module.exports = router;

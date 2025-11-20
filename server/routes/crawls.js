@@ -49,4 +49,24 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
+// DELETE /api/crawls/:id - delete one crawl for current user
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const deleted = await Crawl.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Crawl not found' });
+    }
+
+    return res.status(200).json({ message: 'Crawl deleted' });
+  } catch (err) {
+    console.error('Error deleting crawl', err);
+    return res.status(500).json({ message: 'Failed to delete crawl' });
+  }
+});
+
+
 module.exports = router;
