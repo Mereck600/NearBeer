@@ -67,12 +67,6 @@ function buildWalkingCrawl(candidates, count, maxStepKm = 1.5) {
 
 
 
-
-
-
-
-
-
 // GET /api/places/nearby?lat=..&lng=..&count=5
 router.get('/nearby', auth, async (req, res) => {
   const { lat, lng, count = 5 } = req.query;
@@ -138,7 +132,7 @@ router.get('/geocode', auth, async (req, res) => {
       },
       headers: {
         // Nominatim requires a User-Agent
-        'User-Agent': 'nearBeer/1.0 (https://example.com)',
+        'User-Agent': 'nearBeer/1.0 (https://nearBeer.com)',
       },
     });
 
