@@ -9,9 +9,24 @@ const placesRoutes = require('./routes/places');
 const crawlsRoutes = require('./routes/crawls');
 
 const app = express();
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://javatreetech.com',
+  'https://javatreetech.com',
+];
 
-// Middleware
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow REST clients / curl with no origin
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Routes
