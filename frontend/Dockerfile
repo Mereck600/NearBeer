@@ -1,17 +1,26 @@
 # frontend/Dockerfile
-FROM node:18-alpine
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the frontend code
 COPY . .
+RUN npm run build
 
-# CRA default port
-EXPOSE 3000
 
-# Start React dev server
-CMD ["npm", "start"]
+# ---------------------------
+# Production Nginx web server
+# ---------------------------
+
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy our custom nginx config
+COPY ../nginx/nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]
