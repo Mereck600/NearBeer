@@ -1,0 +1,16 @@
+node_modules
+build
+dist
+.git
+.gitignore
+Dockerfile
+docker-compose.yaml
+npm-debug.log*
+yarn.lock
+package-lock.json
+
+# OS/editor junk
+.DS_Store
+*.swp
+*.log
+
