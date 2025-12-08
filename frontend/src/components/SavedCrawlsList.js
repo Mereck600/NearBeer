@@ -1,65 +1,93 @@
-// client/src/components/SavedCrawlsList.js
+// frontend/src/components/SavedCrawlsList.js
 import React from 'react';
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  IconButton,
+  Typography,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function SavedCrawlsList({ crawls, onSelect, onDelete }) {
   if (!crawls.length) {
-    return <p>You don’t have any saved crawls yet.</p>;
+    return (
+      <Typography variant="body2" sx={{ opacity: 0.8 }}>
+        You don’t have any saved crawls yet.
+      </Typography>
+    );
   }
 
   return (
-    <div>
-      <h3>My Saved Routes</h3>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {crawls.map(crawl => (
-          <li
-            key={crawl._id}
-            style={{
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              padding: '0.5rem 0.5rem 0.5rem 0.75rem',
-              marginBottom: '0.5rem',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            {/* Clickable area to load crawl */}
-            <div
-              style={{ cursor: 'pointer', flex: 1, marginRight: '0.5rem' }}
-              onClick={() => onSelect && onSelect(crawl)}
-            >
-              <strong>{crawl.name}</strong>
-              <br />
-              <small>
-                {crawl.stops?.length || 0} stops •{' '}
-                {new Date(crawl.createdAt).toLocaleString()}
-              </small>
-            </div>
+    <Box>
+      <Typography
+        variant="subtitle1"
+        sx={{ mb: 1, fontWeight: 'bold' }}
+      >
+        My Saved Routes
+      </Typography>
 
-            {/* X button to delete */}
-            <button
-              type="button"
-              onClick={e => {
-                e.stopPropagation(); // don’t trigger onSelect
-                onDelete && onDelete(crawl._id);
+      <List disablePadding>
+        {crawls.map((crawl) => (
+          <ListItem
+            key={crawl._id}
+            disablePadding
+            sx={{
+              mb: 0.5,
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation(); // don't trigger onSelect
+                  onDelete && onDelete(crawl._id);
+                }}
+                sx={{
+                  color: 'inherit',          
+                  opacity: 0.8,
+                  '&:hover': { opacity: 1 },
+                }}
+                aria-label={`Delete crawl ${crawl.name}`}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            }
+          >
+            <ListItemButton
+              onClick={() => onSelect && onSelect(crawl)}
+              sx={{
+                borderRadius: 2,
+                px: 1.25,
+                py: 0.75,
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.08)', 
+                },
               }}
-              style={{
-                border: 'none',
-                background: 'transparent',
-                color: '#c00',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-              aria-label={`Delete crawl ${crawl.name}`}
-              title="Delete this route"
             >
-              ×
-            </button>
-          </li>
+              <Box>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600 }}
+                >
+                  {crawl.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ display: 'block', opacity: 0.8 }}
+                >
+                  {(crawl.stops?.length || 0)} stops •{' '}
+                  {new Date(crawl.createdAt).toLocaleString()}
+                </Typography>
+              </Box>
+            </ListItemButton>
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 }
 
